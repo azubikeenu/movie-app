@@ -19,8 +19,7 @@ figure .image img {
 }
 
 .results {
-  max-height: 500px;
-  overflow-y: scroll;
+  max-height: none;
 }
 
 .title .icon {
