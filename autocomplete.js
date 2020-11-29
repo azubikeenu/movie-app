@@ -37,6 +37,7 @@ const createAutoComplete = ( { root, renderOption, onOptionSelect, inputValue, f
                 option.addEventListener( 'click', ( e ) => {
                     dropDown.classList.remove( "is-active" )
                     searchField.value = inputValue( item );
+
                     onOptionSelect( item )
 
                 } )

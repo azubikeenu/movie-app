@@ -1,14 +1,9 @@
 
-
-createAutoComplete( {
-    root: document.querySelector( ".auto_complete" ),
+const autoCompleteConfig = {
     renderOption: ( movie ) => {
         const imgSrc = ( movie.Poster === "N/A" ) ? "" : movie.Poster;
         return `<img src="${imgSrc}"/>
         ${movie.Title} (${movie.Year})`
-    },
-    onOptionSelect: ( movie ) => {
-        onMovieSelect( movie );
     }
     , inputValue: ( movie ) => {
         return movie.Title
@@ -26,12 +21,29 @@ createAutoComplete( {
         return ( response.data.hasOwnProperty( "Error" ) ) ? [] : response.data.Search;
     }
 
+}
+
+createAutoComplete( {
+    root: document.querySelector( "#left-auto_complete" ),
+    ...autoCompleteConfig,
+    onOptionSelect: ( movie ) => {
+        document.querySelector( ".tutorial" ).classList.add( "is-hidden" );
+        onMovieSelect( movie, document.querySelector( "#summary-left" ) );
+    }
+
+} );
+createAutoComplete( {
+    root: document.querySelector( "#right-auto_complete" ),
+    ...autoCompleteConfig,
+    onOptionSelect: ( movie ) => {
+        document.querySelector( ".tutorial" ).classList.add( "is-hidden" );
+        onMovieSelect( movie, document.querySelector( "#summary-right" ) );
+    }
 
 } );
 
 
-
-const onMovieSelect = async movie => {
+const onMovieSelect = async ( movie, summaryElement ) => {
 
     const response = await axios.get( "http://www.omdbapi.com/", {
         params: {
@@ -40,7 +52,7 @@ const onMovieSelect = async movie => {
         }
     } )
 
-    document.querySelector( "#summary" ).innerHTML = movieTemplate( response.data
+    summaryElement.innerHTML = movieTemplate( response.data
     );
 
 }
@@ -69,12 +81,12 @@ const movieTemplate = ( movieDetail ) => {
       <p class="title">${movieDetail.Awards}</p>
       <p class="subtitle"> Awards</p>
     </article>
-    
+
     <article class="notification is-primary">
     <p class="title">${movieDetail.BoxOffice}</p>
     <p class="subtitle"> Box office</p>
   </article>
-  
+
   <article class="notification is-primary">
   <p class="title">${movieDetail.Metascore}</p>
   <p class="subtitle"> Metascore</p>
