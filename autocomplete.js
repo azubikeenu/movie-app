@@ -24,16 +24,17 @@ const createAutoComplete = ( { root, renderOption, onOptionSelect, inputValue, f
             dropDown.classList.remove( "is-active" );// hide search results
         } else {
             dropDown.classList.add( "is-active" );// show search results  
-            resultsWrapper.innerHTML = "";
+            resultsWrapper.innerHTML = ""; // clear the results wrapper for each rendering
 
             for ( const item of items ) {
+                // render the results container 
                 const option = document.createElement( "a" );
                 option.classList.add( "dropdown-item" );
 
                 option.innerHTML =
                     renderOption( item );
                 ;
-
+                // add a click event to each option
                 option.addEventListener( 'click', ( e ) => {
                     dropDown.classList.remove( "is-active" )
                     searchField.value = inputValue( item );

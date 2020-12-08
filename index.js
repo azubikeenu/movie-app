@@ -28,7 +28,7 @@ createAutoComplete( {
     ...autoCompleteConfig,
     onOptionSelect: ( movie ) => {
         document.querySelector( ".tutorial" ).classList.add( "is-hidden" );
-        onMovieSelect( movie, document.querySelector( "#summary-left" ) );
+        onMovieSelect( movie, document.querySelector( "#summary-left" ), 'left' );
     }
 
 } );
@@ -37,13 +37,16 @@ createAutoComplete( {
     ...autoCompleteConfig,
     onOptionSelect: ( movie ) => {
         document.querySelector( ".tutorial" ).classList.add( "is-hidden" );
-        onMovieSelect( movie, document.querySelector( "#summary-right" ) );
+        onMovieSelect( movie, document.querySelector( "#summary-right" ), 'right' );
     }
 
 } );
 
+let leftMovie
+let rightMovie;
 
-const onMovieSelect = async ( movie, summaryElement ) => {
+
+const onMovieSelect = async ( movie, summaryElement, side ) => {
 
     const response = await axios.get( "http://www.omdbapi.com/", {
         params: {
@@ -51,15 +54,55 @@ const onMovieSelect = async ( movie, summaryElement ) => {
             i: movie.imdbID
         }
     } )
+    if ( side === 'left' ) {
+        leftMovie = response.data
+    } else {
+        rightMovie = response.data;
+    }
 
     summaryElement.innerHTML = movieTemplate( response.data
     );
 
+    /**
+    * conditions for comparison 
+    * The left and right movies have to be clicked 
+    * 
+    */
+    if ( leftMovie && rightMovie ) {
+        // run comparison 
+        runComparison( leftMovie, rightMovie );
+
+
+    }
+
+
+}
+
+const runComparison = ( leftMovie, rightMovie ) => {
+    // get the sumarry contianer for the left movie and right movie 
+    const leftSummary = document.querySelector( "#summary-left" );
+    const rightSummary = document.querySelector( "#summary-right" );
+    // compare the metascore as a test ; 
+
+}
+
+const getTotalAwards = ( awardString ) => {
+    return awardString.split( " " )
+        .filter( x => !isNaN( x ) )
+        .map( x => parseInt( x ) )
+        .reduce( ( acc, curr ) => acc + curr );
 }
 
 
-
 const movieTemplate = ( movieDetail ) => {
+    const dollars = parseInt( movieDetail.BoxOffice.replace( /\$/g, '' ).replace( /,/g, '' ) );
+    const metaScore = parseInt( movieDetail.Metascore );
+    const imdbRating = parseFloat( movieDetail.imdbRating );
+    const imdbVotes = parseInt( movieDetail.imdbVotes.replace( /,/g, '' ) );
+    const totalAwards = getTotalAwards( movieDetail.Awards );
+    console.log( metaScore, imdbRating, imdbVotes );
+    console.log( totalAwards );
+
     return `
     <article class="media">
     <figure class  = "media-left">
