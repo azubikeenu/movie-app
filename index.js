@@ -42,9 +42,8 @@ createAutoComplete( {
 
 } );
 
-let leftMovie
+let leftMovie;
 let rightMovie;
-
 
 const onMovieSelect = async ( movie, summaryElement, side ) => {
 
@@ -70,7 +69,7 @@ const onMovieSelect = async ( movie, summaryElement, side ) => {
     */
     if ( leftMovie && rightMovie ) {
         // run comparison 
-        runComparison( leftMovie, rightMovie );
+        runComparison();
 
 
     }
@@ -78,19 +77,38 @@ const onMovieSelect = async ( movie, summaryElement, side ) => {
 
 }
 
-const runComparison = ( leftMovie, rightMovie ) => {
-    // get the sumarry contianer for the left movie and right movie 
-    const leftSummary = document.querySelector( "#summary-left" );
-    const rightSummary = document.querySelector( "#summary-right" );
-    // compare the metascore as a test ; 
+const runComparison = () => {
+    // get the summary contianer for the left movie and right movie 
+    let leftSideStats = document.querySelectorAll( "#summary-left .notification" );
+    let rightSideStats = document.querySelectorAll( "#summary-right .notification" );
+
+    leftSideStats.forEach( ( item, index ) => {
+        const rightStats = rightSideStats[index];
+        const leftStats = item;
+        const rightValue = rightStats.dataset.value;
+        const leftValue = leftStats.dataset.value;
+        if ( leftValue > rightValue ) {
+            rightStats.classList.remove( 'is-primary' );
+            rightStats.classList.add( 'is-warning' );
+        } else if ( leftValue < rightValue ) {
+            leftStats.classList.remove( 'is-primary' );
+            leftStats.classList.add( 'is-warning' );
+        }
+
+    } )
 
 }
 
 const getTotalAwards = ( awardString ) => {
-    return awardString.split( " " )
+    const scoresMap = awardString.split( " " )
         .filter( x => !isNaN( x ) )
-        .map( x => parseInt( x ) )
-        .reduce( ( acc, curr ) => acc + curr );
+        .map( x => parseInt( x ) );
+
+    if ( scoresMap.length > 0 ) {
+        return scoresMap.reduce( ( prev, curr ) => prev + curr )
+    } else {
+        return 0;
+    }
 }
 
 
@@ -99,9 +117,8 @@ const movieTemplate = ( movieDetail ) => {
     const metaScore = parseInt( movieDetail.Metascore );
     const imdbRating = parseFloat( movieDetail.imdbRating );
     const imdbVotes = parseInt( movieDetail.imdbVotes.replace( /,/g, '' ) );
-    const totalAwards = getTotalAwards( movieDetail.Awards );
-    console.log( metaScore, imdbRating, imdbVotes );
-    console.log( totalAwards );
+    const awards = getTotalAwards( movieDetail.Awards );
+
 
     return `
     <article class="media">
@@ -120,27 +137,27 @@ const movieTemplate = ( movieDetail ) => {
     </div>
     </article>
 
-    <article class="notification is-primary">
+    <article data-value=${awards} class="notification is-primary">
       <p class="title">${movieDetail.Awards}</p>
       <p class="subtitle"> Awards</p>
     </article>
 
-    <article class="notification is-primary">
+    <article data-value =${dollars} class="notification is-primary">
     <p class="title">${movieDetail.BoxOffice}</p>
     <p class="subtitle"> Box office</p>
   </article>
 
-  <article class="notification is-primary">
+  <article data-value=${metaScore} class="notification is-primary">
   <p class="title">${movieDetail.Metascore}</p>
   <p class="subtitle"> Metascore</p>
 </article>
 
-<article class="notification is-primary">
+<article data-value=${imdbRating} class="notification is-primary">
 <p class="title">${movieDetail.imdbRating}</p>
 <p class="subtitle"> IMDB Rating</p>
 </article>
 
-<article class="notification is-primary">
+<article data-value=${imdbVotes} class="notification is-primary">
 <p class="title">${movieDetail.imdbVotes}</p>
 <p class="subtitle"> IMDB Votes</p>
 </article>
